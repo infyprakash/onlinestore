@@ -1,0 +1,83 @@
+{% load display_tags %}
+{% load i18n %}
+{% load image_tags %}
+{% load reviews_tags %}
+
+{% block product %}
+<!-- <div class="col-lg-3 col-md-4 col-sm-6 mt-40"> -->
+    <!-- single-product-wrap start -->
+    <div class="single-product-wrap">
+        <div class="product-image">
+            {% block product_image %}
+            <!-- <div class="image_container w-100"> -->
+                {% with image=product.primary_image %}
+                    {% oscar_thumbnail image.original "x155" upscale=False as thumb %}
+                    <a href="{{ product.get_absolute_url }}">
+                        <img src="{{ thumb.url }}" alt="{{ product.get_title }}">
+                    </a>
+                {% endwith %}
+            <!-- </div> -->
+        {% endblock %}
+        </div>
+        <div class="product_desc">
+            <div class="product_desc_info">
+                <div class="product-review">
+                    <h5 class="manufacturer">
+                        <!-- <a href="{{ product.get_absolute_url}}">{{product.get_product_class}}</a> -->
+                    </h5>
+
+                    {% block product_review %}
+                    {% iffeature "reviews" %}
+                    <div class="rating-box">
+                        <ul class="rating {{ product.rating|as_stars }}">
+                            <li><i class="fa fa-star-o"></i></li>
+                            <li><i class="fa fa-star-o"></i></li>
+                            <li><i class="fa fa-star-o"></i></li>
+                            <li class="no-star"><i class="fa fa-star-o"></i></li>
+                            <li class="no-star"><i class="fa fa-star-o"></i></li>
+                        </ul>
+                    </div>
+                    {% endiffeature %}
+                    {% endblock %}
+
+                </div>
+                <h4>
+                    <!-- <a class="product_name" href="single-product.html">Accusantium dolorem1</a> -->
+                    {% block product_title %}
+                    <!-- <h3 class="mt-3"> -->
+                        <a class="product_name" href="{{ product.get_absolute_url }}" title="{{ product.get_title }}">
+                            {{ product.get_title|truncatewords:4 }}
+                        </a>
+                    <!-- </h3> -->
+                {% endblock %}
+                </h4>
+            
+            {% block product_price %}
+            <div class="price-box">
+                <span class="new-price">
+                <!-- <div class="product_price w-100"> -->
+                    {% include "oscar/catalogue/partials/stock_record.html" %}
+                <!-- </div> -->
+            </span>
+            </div>
+
+            {% endblock %}
+
+
+            </div>
+            <div class="add-actions">
+                <ul class="add-actions-link">
+                    <li class="add-cart">
+                        {% if not product.is_parent and not product.has_options %}
+                        {% include "oscar/catalogue/partials/add_to_basket_form_compact.html" %}
+                    {% endif %}
+                    </li>
+                    <!-- <li><a href="#" title="quick view" class="quick-view-btn" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-eye"></i></a></li> -->
+                    <!-- <li><a class="links-details" href="wishlist.html"><i class="fa fa-heart-o"></i></a></li> -->
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- single-product-wrap end -->
+<!-- </div> -->
+{% endblock %}

@@ -1,0 +1,51 @@
+{% load i18n %}
+{% load image_tags %}
+
+{% with all_images=product.get_all_images %}
+    {# use length rather then count as the images get queried anyways #}
+
+    {% if all_images|length > 1 %}
+    <div class="col-lg-5 col-md-6">
+                               <!-- Product Details Left -->
+                                <div class="product-details-left">
+                                    <div class="product-details-images slider-navigation-1">
+                                            {% for image in all_images %}
+                                            <div class="lg-image">
+                                            <a class="popup-img venobox vbox-item" href="{{ thumb.url }}" data-gall="myGallery">
+                                                {% oscar_thumbnail image.original "440x400" upscale=False as thumb %}
+                                                <img src="{{ thumb.url }}" alt="{{ product.get_title }}">
+                                            </a>
+                                            </div>
+                                            {% endfor %}
+                                    </div>
+                                    <div class="product-details-thumbs slider-thumbs-1">
+                                        {% for image in all_images %} 
+                                        {% oscar_thumbnail image.original "65x55" crop="center" as thumb %}
+                                        <div class="sm-image"><img src="{{ thumb.url }}" alt="{{ product.get_title }}" /> </div>                                      
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <!--// Product Details Left -->
+    </div>
+    
+
+                <!-- content-wraper end -->
+
+    {% else %}
+
+        {# Only one image to show #}
+        <div id="product_gallery" class="carousel">
+            <div class="img-thumbnail">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                    {% with image=product.primary_image %}
+                        {% oscar_thumbnail image.original "440x400" upscale=False as thumb %}
+                        <img src="{{ thumb.url }}" alt="{{ product.get_title }}" />
+                    {% endwith %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% endif %}
+{% endwith %}

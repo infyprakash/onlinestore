@@ -1,0 +1,29 @@
+{% extends "oscar/checkout/checkout.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% trans "Payment details" %} | {{ block.super }}
+{% endblock %}
+
+{% block checkout_nav %}
+    {% include 'oscar/checkout/nav.html' with step=3 %}
+{% endblock %}
+
+{% block checkout_title %}{% trans "Enter payment details" %}{% endblock %}
+
+{% block order_contents %}{% endblock %}
+{% block shipping_address %}{% endblock %}
+{% block shipping_method %}{% endblock %}
+{% block payment_method %}{% endblock %}
+
+{% block payment_details %}
+    {% block payment_details_content %}
+    <div class="card" style="width: 50rem;">
+        <h5 class="card-header">Payment Options</h5>
+        <div class="card-body">
+            <span class="badge badge-success" style="font-size: large;">CASH ON DELIVERY </span>
+          <a id="view_preview" href="{% url 'checkout:preview' %}" class="btn btn-warning text-white  float-right">{% trans "Continue" %}</a>
+        </div>
+      </div>
+    {% endblock payment_details_content %}
+{% endblock payment_details %}

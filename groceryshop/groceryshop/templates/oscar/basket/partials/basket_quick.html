@@ -1,0 +1,46 @@
+{% load history_tags %}
+{% load basket_tags %}
+{% load currency_filters %}
+{% load image_tags %}
+{% load i18n %}
+
+<div class="mini-cart">
+<ul class="minicart-product-list">
+    {% if request.basket.num_lines %}
+        {% for line in request.basket.all_lines %}
+            <li>
+                {% with image=line.product.primary_image %}
+                {% oscar_thumbnail image.original "100x100" upscale=False as thumb %}
+                <a href="{{ line.product.get_absolute_url }}" class="minicart-product-image">
+                    <img src="{{ thumb.url }}" alt="{{ line.product.get_title }}" class="img-thumbnail w-auto mx-auto my-0">
+                </a>
+            {% endwith %}
+
+                <div class="minicart-product-details">
+                    <h6><a href="{{ line.product.get_absolute_url }}">{{ line.description }}</a></h6>
+                    <span>{{ line.unit_price_excl_tax|currency:request.basket.currency }} x {{ line.quantity }}</span>
+                </div>
+            </li>
+        {% endfor %}
+</ul>
+
+<p class="minicart-total">
+    {% if request.basket.is_tax_known %}
+    {% trans "Sub Total:" %} {{ request.basket.total_incl_tax|currency:request.basket.currency }}
+    {% else %}
+    {% trans "Sub Total:" %} {{ request.basket.total_excl_tax|currency:request.basket.currency }}
+    {% endif %}
+</p>
+<div class="minicart-button">
+    <a href="{% url 'basket:summary' %}" class="li-button li-button-fullwidth li-button-dark">
+        <span>View Full Cart</span>
+    </a>
+    <a href="{% url 'checkout:index' %}" class="li-button li-button-fullwidth">
+        <span>Checkout</span>
+    </a>
+</div>
+{% else %}
+<li><p>{% trans "Your basket is empty." %}</p></li>
+{% endif %}
+</div>
+

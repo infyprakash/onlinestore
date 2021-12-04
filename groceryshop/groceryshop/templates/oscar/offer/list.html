@@ -1,0 +1,54 @@
+{% extends "oscar/layout.html" %}
+
+
+{% load i18n %}
+{% load product_tags %}
+
+{% block title %}
+{% trans "Offers" %} | {{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ homepage_url }}">{% trans "Home" %}</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">{% trans "Offers" %}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block headertext %}
+<h3 style="text-align:center;color: red;"><i class="fa fa-gift"></i> {% trans "Offers" %}</h3>
+{% endblock %}
+
+{% block content %}
+    {% if not offers %}
+        <p>{% trans "There are no site offers at the moment." %}</p>
+    {% else %}
+        {% for offer in offers %}
+        <div class="card mb-10">
+            <div class="card-body">
+                <h5 class="card-title" style="color: blue;">
+                    {{ offer.name }}
+                </h5>
+                {% if offer.description %}
+                <p class="card-text" style="color: red;">{{ offer.description|safe }}</p>
+            {% endif %}
+            </div>
+        </div>
+        {% if offer.has_products %}
+            <ul class="row list-unstyled mx-0">
+                {% for product in offer.products|slice:":12" %}
+                <li class="col-sm-4 col-md-3 col-lg-3">{% render_product product %}</li>
+                {% endfor %}
+            </ul>
+            <p>
+                <a class="btn btn-outline-danger mt-50" href="{% url 'offer:detail' slug=offer.slug %}">{% trans "Browse products in offer" %} <i class="fa fa-arrow-right"></i></a>
+            </p>
+        {% endif %}
+        <hr/>
+        {% endfor %}
+    {% endif %}
+{% endblock content %}

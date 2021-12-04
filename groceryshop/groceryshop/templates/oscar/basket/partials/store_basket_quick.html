@@ -1,0 +1,49 @@
+<!-- {% include "oscar/basket/partials/basket_quick.html" %} -->
+
+
+{% load history_tags %}
+{% load basket_tags %}
+{% load currency_filters %}
+{% load image_tags %}
+{% load i18n %}
+
+
+
+<table class="table table-bordered">
+    <tbody>
+        {% for line in request.basket.all_lines %}
+        <tr>
+            <td>
+                {% with image=line.product.primary_image %}
+                {% oscar_thumbnail image.original "100x100" upscale=False as thumb %}
+                <a href="{{ line.product.get_absolute_url }}" class="minicart-product-image">
+                    <img src="{{ thumb.url }}" alt="{{ line.product.get_title }}">
+                </a>
+            {% endwith %}
+            </td>
+            
+            <td>
+                <h6><a href="{{ line.product.get_absolute_url }}">{{ line.description }}</a></h6>
+                <span>{{ line.unit_price_excl_tax|currency:request.basket.currency }} x {{ line.quantity }}</span>
+            </td>
+
+        </tr>
+        {% endfor %}
+
+        <tr>
+            <th>Total</th>
+            <th>
+                {% if request.basket.is_tax_known %}
+                {{ request.basket.total_incl_tax|currency:request.basket.currency }}
+                {% else %}
+                 {{ request.basket.total_excl_tax|currency:request.basket.currency }}
+                {% endif %}
+            </th>
+        </tr>
+    </tbody>
+
+</table>
+
+
+
+

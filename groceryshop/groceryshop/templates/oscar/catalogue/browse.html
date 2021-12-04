@@ -1,0 +1,149 @@
+{% extends "oscar/layout_2_col.html" %}
+
+{% load basket_tags %}
+{% load category_tags %}
+{% load product_tags %}
+{% load i18n %}
+
+{% block title %}
+    {% if summary %}{{ summary }} |{% endif %} {{ block.super }}
+{% endblock %}
+
+
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ homepage_url }}">{% trans "Home" %}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ summary }}</li>
+        </ol>
+    </nav>
+{% endblock breadcrumbs %}
+
+{% block column_left %}
+    {% category_tree as tree_categories %}
+    {% if tree_categories %}
+        <h4>{% trans "Show results for" %}</h4>
+        <div class="side_categories card card-body bg-light">
+            <ul class="nav nav-list flex-column">
+                {% for tree_category in tree_categories %}
+                    <li class="mt-2">
+                        <a href="{{ tree_category.url }}">
+                            {% if tree_category.pk == category.pk %}
+                                <strong>{{ tree_category.name }}</strong>
+                            {% else %}
+                                {{ tree_category.name }}
+                            {% endif %}
+                        </a>
+
+                        {% if tree_category.has_children %}<ul>{% else %}</li>{% endif %}
+                        {% for n in tree_category.num_to_close %}
+                            </ul></li>
+                        {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    {% if has_facets %}
+        <h4>{% trans "Refine by" %}</h4>
+        <div class="side_categories card card-body bg-light">
+            {% for field, data in facet_data.items %}
+                {% if data.results %}
+                    {% include 'oscar/search/partials/facet.html' with name=data.name items=data.results %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+    <form method="get">
+        {# Render other search params as hidden inputs #}
+        {% for value in selected_facets %}
+            <input type="hidden" name="selected_facets" value="{{ value }}" />
+        {% endfor %}
+        <input type="hidden" name="q" value="{{ search_form.q.value|default_if_none:"" }}" />
+
+        {% if paginator.count %}
+            {% if paginator.num_pages > 1 %}
+                {% blocktrans with start=page_obj.start_index end=page_obj.end_index count num_results=paginator.count %}
+                    <strong>{{ num_results }}</strong> result - showing <strong>{{ start }}</strong> to <strong>{{ end }}</strong>.
+                {% plural %}
+                    <strong>{{ num_results }}</strong> results - showing <strong>{{ start }}</strong> to <strong>{{ end }}</strong>.
+                {% endblocktrans %}
+            {% else %}
+                {% blocktrans count num_results=paginator.count %}
+                    <strong>{{ num_results }}</strong> result.
+                {% plural %}
+                    <strong>{{ num_results }}</strong> results.
+                {% endblocktrans %}
+            {% endif %}
+            {% if form %}
+                <div class="float-right">
+                    {% include "oscar/partials/form_field.html" with field=form.sort_by style='horizontal' %}
+                </div>
+            {% endif %}
+        {% else %}
+            <p>
+                {% trans "<strong>0</strong> results." %}
+            </p>
+        {% endif %}
+    </form>
+
+    {% if products %}
+    <div class="content-wraper pt-60 pb-60">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="shop-products-wrapper">
+                        <div class="tab-content">
+                            <div id="grid-view" class="tab-pane fade active show" role="tabpanel">
+                                <div class="product-area shop-product-area">
+                                    <div class="row">
+                                        {% for product in products %}
+                                        <div class="col-lg-3 col-md-4 col-sm-6 mt-40">
+                                            {% render_product product %}
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="paginatoin-area">
+                                {% include "oscar/partials/pagination.html" %}
+                                <!-- <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <p>Showing 1-12 of 13 item(s)</p>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <ul class="pagination-box">
+                                            <li><a href="#" class="Previous"><i class="fa fa-chevron-left"></i> Previous</a>
+                                            </li>
+                                            <li class="active"><a href="#">1</a></li>
+                                            <li><a href="#">2</a></li>
+                                            <li><a href="#">3</a></li>
+                                            <li>
+                                              <a href="#" class="Next"> Next <i class="fa fa-chevron-right"></i></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div> -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- shop-products-wrapper end -->
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+        <p class="nonefound">{% trans "No products found." %}</p>
+    {% endif %}
+
+{% endblock content %}
+
+{% block onbodyload %}
+    {{ block.super }}
+    oscar.search.init();
+{% endblock %}
